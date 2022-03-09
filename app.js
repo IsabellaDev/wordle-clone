@@ -129,7 +129,7 @@ const checkRow = () => {
                     } else {
                         if (currentRow >= 5) {
                             isGameOver = true
-                            showMessage("Game Over.The correct word is: " + wordle + ". Hope you will win next time!")
+                            showMessage("The correct word is: " + wordle + ".")
                             return
                         } else {
                             currentRow++;
