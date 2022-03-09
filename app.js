@@ -71,20 +71,15 @@ guessRows.forEach((guessRow, guessRowIndex) => {
 
 const handleClick = (key) => {
     if (!isGameOver) {
-        console.log('clicked', key)
         if (key === '<<' && currentTile > 0) {
             deleteLetter(key)
-            console.log(guessRows)
             return
         }
         else if (key === 'ENTER') {
-            console.log("Check row")
-            console.log(guessRows)
             checkRow()
         }
         else if (currentRow < 6 && currentTile < 5) {
             addLetter(key)
-            console.log(guessRows)
         }
     }
 
@@ -122,7 +117,6 @@ const checkRow = () => {
         fetch(`https://wordle-clone-backend.herokuapp.com/check?guess=${guess}`)
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 if (data == 'Entry word not found') {
                     showMessage("That is not a valid word.")
                 } else {
