@@ -5,6 +5,8 @@
 
 body {
     background-color: #121213;
+    max-width: 500px;
+    margin: auto;
 }
 
 .game-container {
@@ -24,6 +26,9 @@ body {
 
 .tile-container {
     width: 330px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: auto;
     margin-bottom: 30px;
 }
 .key-container {
