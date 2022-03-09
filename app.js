@@ -2,7 +2,16 @@ const tileDisplay = document.querySelector('.tile-container')
 const keyboard = document.querySelector('.key-container')
 const messageDisplay = document.querySelector('.message-container')
 
-const wordle = 'SUPER'
+let wordle
+const getWordle = () => {
+    fetch('http://localhost:8080/word')
+        .then(res => res.json())
+        .then(data => {
+            console.log(data)
+            wordle = data.toUpperCase()
+        }).catch(err => console.log(err))
+}
+getWordle()
 //key values
 const keys = [
     'Q',
@@ -36,22 +45,22 @@ const keys = [
 ]
 
 const guessRows = [
-    ['', '', '', '', ''], 
-    ['', '', '', '', ''], 
-    ['', '', '', '', ''], 
-    ['', '', '', '', ''], 
-    ['', '', '', '', ''], 
-    ['', '', '', '', ''], 
+    ['', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['', '', '', '', ''],
+    ['', '', '', '', ''],
 ]
 
 let currentRow = 0
 let currentTile = 0
 let isGameOver = false
 
-guessRows.forEach((guessRow, guessRowIndex)=>{
+guessRows.forEach((guessRow, guessRowIndex) => {
     const rowElement = document.createElement('div')
     rowElement.setAttribute('id', 'guessRow-' + guessRowIndex)
-    guessRow.forEach((guess, guessIndex)=>{
+    guessRow.forEach((guess, guessIndex) => {
         const tileElement = document.createElement('div')
         tileElement.setAttribute('id', 'guessRow-' + guessRowIndex + '-tile-' + guessIndex)
         tileElement.classList.add('tile')
@@ -60,75 +69,90 @@ guessRows.forEach((guessRow, guessRowIndex)=>{
     tileDisplay.append(rowElement)
 })
 
-const handleClick = (key) =>{
-    console.log('clicked', key)
-    if (key === '<<' && currentTile > 0){
-        deleteLetter(key)
-        console.log(guessRows)
-        return
+const handleClick = (key) => {
+    if (!isGameOver) {
+        console.log('clicked', key)
+        if (key === '<<' && currentTile > 0) {
+            deleteLetter(key)
+            console.log(guessRows)
+            return
+        }
+        else if (key === 'ENTER') {
+            console.log("Check row")
+            console.log(guessRows)
+            checkRow()
+        }
+        else if (currentRow < 6 && currentTile < 5) {
+            addLetter(key)
+            console.log(guessRows)
+        }
     }
-    else if (key === 'ENTER') {
-        console.log("Check row")
-        console.log(guessRows)
-        checkRow()
-    }
-    else if (currentRow < 6 && currentTile < 5) {
-        addLetter(key)
-        console.log(guessRows)
-    }
+
 }
 // set keys value and add to keyboard
 keys.forEach(key => {
     const buttonElement = document.createElement('button');
     buttonElement.textContent = key;
     buttonElement.setAttribute('id', key)
-    buttonElement.addEventListener('click', ()=>handleClick(key))
+    buttonElement.addEventListener('click', () => handleClick(key))
     keyboard.append(buttonElement)
 });
 
-const addLetter = (key) =>{
-    const tile = document.getElementById('guessRow-'+currentRow+'-tile-'+currentTile);
+const addLetter = (key) => {
+    const tile = document.getElementById('guessRow-' + currentRow + '-tile-' + currentTile);
     tile.textContent = key;
-    guessRows[currentRow][currentTile]=key
+    guessRows[currentRow][currentTile] = key
     tile.setAttribute('data', key)
-    currentTile++;   
+    currentTile++;
 }
 
 const deleteLetter = () => {
     currentTile--;
-    const tile = document.getElementById('guessRow-'+currentRow+'-tile-'+currentTile);
+    const tile = document.getElementById('guessRow-' + currentRow + '-tile-' + currentTile);
     tile.textContent = ''
-    guessRows[currentRow][currentTile]=''
+    guessRows[currentRow][currentTile] = ''
     tile.setAttribute('data', '')
 
 }
 
 const checkRow = () => {
-    if (currentTile === 5){
-        const guess = guessRows[currentRow].join('')
-        flipTile()
-        if (wordle === guess) {
-            showMessage("Magnificant!")
-            isGameOver = true
-            return
-        } else {
-            if (currentRow >= 5) {
-                isGameOver = true
-                showMessage("Game Over.The correct word is: " + wordle + ". Hope you will win next time!")
-                return
-            } else {
-                currentRow++;
-                currentTile = 0;
-            }
-        }
+    const guess = guessRows[currentRow].join('')
+
+    if (currentTile > 4) {
+        fetch(`http://localhost:8080/check?guess=${guess}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data == 'Entry word not found') {
+                    showMessage("That is not a valid word.")
+                } else {
+                    flipTile()
+
+                    if (wordle === guess) {
+                        showMessage("Magnificant!")
+                        isGameOver = true
+                        return
+                    } else {
+                        if (currentRow >= 5) {
+                            isGameOver = true
+                            showMessage("Game Over.The correct word is: " + wordle + ". Hope you will win next time!")
+                            return
+                        } else {
+                            currentRow++;
+                            currentTile = 0;
+                        }
+                    }
+                }
+            }).catch(err => console.log(err))
+
     }
 }
 
-const showMessage=(message)=>{
+const showMessage = (message) => {
     const messageElement = document.createElement('p')
     messageElement.textContent = message
     messageDisplay.append(messageElement)
-    setTimeout(()=>messageDisplay.removeChild(messageElement), 2000)
+    setTimeout(() => messageDisplay.removeChild(messageElement), 2000)
 }
 
 const addColorToKey = (data, color) => {
@@ -137,16 +161,16 @@ const addColorToKey = (data, color) => {
 }
 
 const flipTile = () => {
-    const rowTiles = document.querySelector('#guessRow-'+currentRow).childNodes;
+    const rowTiles = document.querySelector('#guessRow-' + currentRow).childNodes;
 
     let checkWordle = wordle
     const guess = []
 
     rowTiles.forEach(tile => {
-        guess.push({letter: tile.getAttribute('data'), color: 'grey-overlay'})
+        guess.push({ letter: tile.getAttribute('data'), color: 'grey-overlay' })
     })
     // replace the matched letter so that same letter would not be checked multiple times
-    guess.forEach((guess, index)=>{
+    guess.forEach((guess, index) => {
         if (guess.letter == wordle[index]) {
             guess.color = 'green-overlay';
             checkWordle = checkWordle.replace(guess.letter, '')
@@ -170,22 +194,4 @@ const flipTile = () => {
         }, 500 * index)
     })
 
-    // rowTiles.forEach((tile, index)=>{
-    //     const data = tile.getAttribute('data')
-
-    //     setTimeout(()=>{
-    //         tile.classList.add('flip')
-    //         if (data === wordle[index]) {
-    //             tile.classList.add('green-overlay')
-    //             addColorToKey(data, 'green-overlay')
-    //         }else if (wordle.includes(data)){
-    //             tile.classList.add('yellow-overlay')
-    //             addColorToKey(data, 'yellow-overlay')
-    //         } else {
-    //             tile.classList.add('grey-overlay')
-    //             addColorToKey(data, 'grey-overlay')
-    //         }
-    //     }, 500 * index)
-
-    // })
 } 

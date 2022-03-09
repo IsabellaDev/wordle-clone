@@ -17,6 +17,7 @@ body {
 
 .title-container {
     text-align: center;
+    justify-content: center;
     width: 510px;
     border-bottom: solid 1px #3a3a3c;
 }
@@ -65,7 +66,8 @@ body {
 }
 
 .message-container {
-    height: 30px;
+    height: 50px;
+    width: 510px;
 }
 
 .message-container p {
