@@ -4,7 +4,7 @@ const messageDisplay = document.querySelector('.message-container')
 
 let wordle
 const getWordle = () => {
-    fetch('http://localhost:8080/word')
+    fetch('https://wordle-clone-backend.herokuapp.com/word')
         .then(res => res.json())
         .then(data => {
             console.log(data)
@@ -119,7 +119,7 @@ const checkRow = () => {
     const guess = guessRows[currentRow].join('')
 
     if (currentTile > 4) {
-        fetch(`http://localhost:8080/check?guess=${guess}`)
+        fetch(`https://wordle-clone-backend.herokuapp.com/check?guess=${guess}`)
             .then(res => res.json())
             .then(data => {
                 console.log(data)
