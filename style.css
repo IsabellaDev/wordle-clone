@@ -118,6 +118,12 @@ body {
   and (max-device-width: 568px)
   and (-webkit-min-device-pixel-ratio: 2) {
 
+    body {
+        background-color: #121213;
+        max-width: 500px;
+        margin: auto;
+    }
+
     .key-container {
     width: 400px;
     display: flex;
@@ -125,8 +131,8 @@ body {
     }
 
     .key-container button{
-    width: 40px;
-    height: 53px;
+    width: 33px;
+    height: 50px;
     border-radius: 4px;
     border: none;
     background-color: #818384;
@@ -138,6 +144,6 @@ body {
 }
     .key-container button:nth-child(20), 
     .key-container button:nth-child(28){
-        width: 68px;
+        width: 63px;
 }
 }
